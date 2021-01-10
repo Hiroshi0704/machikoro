@@ -1,0 +1,114 @@
+.card {
+    width: 200px;
+    min-width: 200px;
+    text-align: center;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    display: inline-block;
+    margin: 1px;
+    min-height: 220px;
+    max-height: 220px;
+}
+.card .activeNumber {
+    padding: 5px 10px;
+    height: 24px;
+}
+.card .name {
+    padding: 5px;
+}
+.card .name .inner {
+    vertical-align: middle;
+}
+.card .explanation {
+    word-break: break-word;
+    padding: 5px;
+    height: 100px;
+
+}
+.card .cost {
+    text-align: left;
+    padding: 5px;
+    margin-top: auto;
+    margin-bottom: 5px;
+}
+.card .cost .inner {
+    border: 1px solid;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: inline-block;
+    text-align: center;
+    padding: 1px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* ランドマーク */
+.card.landmark {
+    background: #cccccc;
+}
+
+.card.landmark.active {
+    background: #ffff9e;
+}
+
+/* 青カード */
+.card.blue {
+    background: #66ccff;
+}
+/* 緑カード */
+.card.green {
+    background: #89ff89;
+}
+/* 赤カード */
+.card.red {
+    background: #ff9999;
+}
+/* 紫カード */
+.card.purple {
+    background: #d3a8ff;
+}
+/* 施設タイプ */
+.card .buildingType {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    background-size: contain;
+    background-repeat: no-repeat;
+    border: 1px solid;
+    vertical-align: middle;
+    border-radius: 100%;
+    padding: 1px;
+}
+/* 施設タイプ 植物 */
+.card .buildingType.plant {
+    background-image: url(../image/plant.png);
+}
+/* 施設タイプ 動物 */
+.card .buildingType.animal {
+    background-image: url(../image/animal.png);
+}
+/* 施設タイプ 商店 */
+.card .buildingType.shop {
+    background-image: url(../image/shop.png);
+}
+/* 施設タイプ カフェ */
+.card .buildingType.cafe {
+    background-image: url(../image/cafe.png);
+}
+/* 施設タイプ 鉱物 */
+.card .buildingType.mineral {
+    background-image: url(../image/mineral.png);
+}
+/* 施設タイプ 工場 */
+.card .buildingType.factory {
+    background-image: url(../image/factory.png);
+}
+/* 施設タイプ 特殊 */
+.card .buildingType.special {
+    background-image: url(../image/special.png);
+}
+/* 施設タイプ 果物 */
+.card .buildingType.fruit {
+    background-image: url(../image/fruit.png);
+}

@@ -1,0 +1,71 @@
+#player {
+    width: 100%;
+    height: 286px;
+}
+
+#player .tabsWrapper {
+    width: calc(100% - 120px);
+    box-sizing: border-box;
+    float: left;
+}
+
+#player .tabs li a {
+    outline: none;
+}
+
+#player .tabs .innerTab {
+    overflow-x: auto;
+    display: flex;
+    height: 280px;
+}
+
+#player .playerList {
+    width: 120px;
+    background: #00ffff;
+    float: right;
+    padding: 10px;
+    box-sizing: border-box;
+    height: 40%;
+}
+
+#player .playerList span.turn {
+    display: none;
+}
+
+#player .playerList span.turn.active {
+    display: inline;
+}
+
+#player .dice {
+    width: 120px;
+    float: right;
+    height: 60%;
+}
+
+#player .dice .result,
+#player .dice .throwDiceButton,
+#player .dice .doneButton,
+#player .dice .double  {
+    width: 100%;
+    height: 32%;
+    margin: 0px;
+}
+
+#player .dice .result {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+button:disabled {
+    background-color: #ccc !important;
+    border: initial !important;
+}
+
+#player .playerSideBar {
+    height: 100%;
+}
+
+#player .dice .double {
+    padding: 8px;
+}

@@ -1,0 +1,10 @@
+#field {
+    padding: 20px;
+}
+
+#public {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    overflow-x: scroll;
+}
