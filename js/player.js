@@ -97,6 +97,12 @@ class Player {
 
         Logger.dice(diceNumber);
 
+        this.invokeCard(diceNumber);
+
+        return diceNumber;
+    };
+
+    invokeCard(diceNumber) {
         const otherPlayer = Game.getInstance().players.filter(player => player !== this);
         for (let player of otherPlayer) {
             player.standBy(diceNumber);
@@ -105,39 +111,70 @@ class Player {
         this.bluePhase(diceNumber, DICE_THROWER.SELF);
         this.greenPhase(diceNumber, DICE_THROWER.SELF);
         this.purplePhase(diceNumber, DICE_THROWER.SELF);
-        return diceNumber;
-    };
+
+        if (!Game.getInstance().isSuspend) {
+            Game.getInstance().prepareNext();
+        }
+    }
 
     standBy(diceNumber) {
         this.redPhase(diceNumber, DICE_THROWER.OTHER);
         this.bluePhase(diceNumber, DICE_THROWER.OTHER);
-    }
+    };
 
     redPhase(diceNumber, diceThrower) {
-        const cards = this.hand.filter(card => card.cardColor === CARD_COLOR.RED);
+        if (Game.getInstance().isSuspend) {
+            return;
+        }
+        let cards = this.hand.filter(card => card.cardColor === CARD_COLOR.RED);
+        cards = cards.filter(card => !card.checked);
         for (let card of cards) {
-            card.checkThenInvoke(diceNumber, diceThrower, this, Game.getInstance().players);
+            Game.getInstance().isSuspend = card.checkThenInvoke(diceNumber, diceThrower, this, Game.getInstance().players);
+            if (Game.getInstance().isSuspend) {
+                break;
+            }
         }
     };
 
     bluePhase(diceNumber, diceThrower) {
-        const cards = this.hand.filter(card => card.cardColor === CARD_COLOR.BLUE);
+        if (Game.getInstance().isSuspend) {
+            return;
+        }
+        let cards = this.hand.filter(card => card.cardColor === CARD_COLOR.BLUE);
+        cards = cards.filter(card => !card.checked);
         for (let card of cards) {
-            card.checkThenInvoke(diceNumber, diceThrower, this, Game.getInstance().players);
+            Game.getInstance().isSuspend = card.checkThenInvoke(diceNumber, diceThrower, this, Game.getInstance().players);
+            if (Game.getInstance().isSuspend) {
+                break;
+            }
         }
     };
 
     greenPhase(diceNumber, diceThrower) {
-        const cards = this.hand.filter(card => card.cardColor === CARD_COLOR.GREEN);
+        if (Game.getInstance().isSuspend) {
+            return;
+        }
+        let cards = this.hand.filter(card => card.cardColor === CARD_COLOR.GREEN);
+        cards = cards.filter(card => !card.checked);
         for (let card of cards) {
-            card.checkThenInvoke(diceNumber, diceThrower, this, Game.getInstance().players);
+            Game.getInstance().isSuspend = card.checkThenInvoke(diceNumber, diceThrower, this, Game.getInstance().players);
+            if (Game.getInstance().isSuspend) {
+                break;
+            }
         }
     };
 
     purplePhase(diceNumber, diceThrower) {
-        const cards = this.hand.filter(card => card.cardColor === CARD_COLOR.PURPLE);
+        if (Game.getInstance().isSuspend) {
+            return;
+        }
+        let cards = this.hand.filter(card => card.cardColor === CARD_COLOR.PURPLE);
+        cards = cards.filter(card => !card.checked);
         for (let card of cards) {
-            card.checkThenInvoke(diceNumber, diceThrower, this, Game.getInstance().players);
+            Game.getInstance().isSuspend = card.checkThenInvoke(diceNumber, diceThrower, this, Game.getInstance().players);
+            if (Game.getInstance().isSuspend) {
+                break;
+            }
         }
     };
 

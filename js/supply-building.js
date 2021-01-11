@@ -14,6 +14,7 @@ class SupplyBuilding {
         this.coin = coin;
         this.extraCoin = 0;
         SupplyBuilding.id++;
+        this.checked = false;
     };
 
     getId() {
@@ -46,6 +47,7 @@ class SupplyBuilding {
     };
 
     checkThenInvoke(diceNumber, diceThrower, cardOwner, players) {
+        this.checked = true;
         if (this.isActive(diceNumber, diceThrower)) {
             // ショッピングモール効果
             if (cardOwner.landmark[LANDMARK_KEY.SHOPPING_MALL].isActive()
@@ -54,8 +56,9 @@ class SupplyBuilding {
             } else {
                 this.extraCoin = 0;
             }
-            this.invoke(diceNumber, diceThrower, cardOwner, players);
+            return this.invoke(diceNumber, diceThrower, cardOwner, players);
         }
+        return false;
     };
 
     getHtmlTemplate() {
@@ -201,15 +204,13 @@ class Cafe extends SupplyBuilding {
 
     invoke(_diceNumber, _diceThrower, cardOwner, players) {
         const coin = this.getTotalCoin();
-        const others = players.filter(player => player !== cardOwner);
+        const nowPlayer = Game.getInstance().getNowPlayer();
         let income = 0;
-        for (let player of others) {
-            const paid = player.pay(coin);
-            income += paid;
-            Logger.info(`${cardOwner.name}は${this.name}で${player.name}から(${paid})コインを得た。`);
-        }
+        const paid = nowPlayer.pay(coin);
+        income += paid;
+        Logger.info(`${cardOwner.name}は${this.name}で${nowPlayer.name}から(${paid})コインを得た。`);
         cardOwner.earn(income);
-        Logger.info(`${cardOwner.name}は${this.name}で合計で(${income})コインを得た。合計(${cardOwner.coins})コインです`);
+        // Logger.info(`${cardOwner.name}は${this.name}で合計で(${income})コインを得た。合計(${cardOwner.coins})コインです`);
     };
 };
 
@@ -291,15 +292,13 @@ class FamilyRestaurant extends SupplyBuilding {
 
     invoke(_diceNumber, _diceThrower, cardOwner, players) {
         const coin = this.getTotalCoin();
-        const others = players.filter(player => player !== cardOwner);
+        const nowPlayer = Game.getInstance().getNowPlayer();
         let income = 0;
-        for (let player of others) {
-            const paid = player.pay(coin);
-            income += paid;
-            Logger.info(`${cardOwner.name}は${this.name}で${player.name}から(${paid})コインを得た。`);
-        }
+        const paid = nowPlayer.pay(coin);
+        income += paid;
+        Logger.info(`${cardOwner.name}は${this.name}で${nowPlayer.name}から(${paid})コインを得た。`);
         cardOwner.earn(income);
-        Logger.info(`${cardOwner.name}は${this.name}で合計で(${income})コインを得た。合計(${cardOwner.coins})コインです`);
+        // Logger.info(`${cardOwner.name}は${this.name}で合計で(${income})コインを得た。合計(${cardOwner.coins})コインです`);
     };
 };
 
@@ -359,7 +358,7 @@ class TelevisionStation extends SupplyBuilding {
         this.$modal = null;
     };
 
-    invoke(_diceNumber, _diceThrower, cardOwner, players) {
+    invoke(diceNumber, _diceThrower, cardOwner, players) {
         const coin = this.getTotalCoin();
         const others = players.filter(player => player !== cardOwner);
 
@@ -368,38 +367,42 @@ class TelevisionStation extends SupplyBuilding {
         this.$modal.appendTo($('body'));
         this.$modal = this.$modal.dialog({
             modal: true,
-            close: this.onClickModalCloseButton.bind(this)
+            close: this.onClickModalCloseButton.bind(this, diceNumber)
         });
 
         // ボタンの作成
         for (let player of others) {
             let $button = $(this.getHtmlSelectPlayerButton(player));
-            $button.on('click', this.onClickModalPlayerButton.bind(this, cardOwner, player, coin));
+            $button.on('click', this.onClickModalPlayerButton.bind(this, diceNumber, cardOwner, player, coin));
             this.$modal.append($button);
         }
 
         // プレイヤーが選択されるまで待機
-        Waiter.waiting = true;
-        Waiter.wait();
+        Game.getInstance().$doneButton.prop('disabled', true);
+        return true;
     };
 
-    onClickModalCloseButton() {
+    onClickModalCloseButton(diceNumber) {
         if (this.$modal !== null) {
             this.$modal.remove();
         }
-        Waiter.waiting = false;
+        Game.getInstance().$doneButton.prop('disabled', false);
         Game.getInstance().$doneButton.focus();
+        Game.getInstance().isSuspend = false;
+        Game.getInstance().getNowPlayer().invokeCard(diceNumber);
     };
 
-    onClickModalPlayerButton(cardOwner, player, coin) {
+    onClickModalPlayerButton(diceNumber, cardOwner, player, coin) {
         if (this.$modal !== null) {
             this.$modal.remove();
         }
         let income = player.pay(coin);
         cardOwner.earn(income);
         Logger.info(`${cardOwner.name}は${this.name}で${player.name}から(${income})コインを得た。合計(${cardOwner.coins})コインです。`);
-        Waiter.waiting = false;
+        Game.getInstance().$doneButton.prop('disabled', false);
         Game.getInstance().$doneButton.focus();
+        Game.getInstance().isSuspend = false;
+        Game.getInstance().getNowPlayer().invokeCard(diceNumber);
     };
 
     getHtmlSelectPlayerModal() {

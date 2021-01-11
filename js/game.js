@@ -1,6 +1,31 @@
+class GameConfig {
+    static playerNames = ['Player1', 'Player2', 'Player3', 'Player4'];
+    static cardStock = [
+        {card: Wheat, length: 4},
+        {card: StockFarm, length: 4},
+        {card: Bakery, length: 4},
+        {card: Cafe, length: 4},
+        {card: ConvenienceStore, length: 4},
+        {card: Forest, length: 4},
+        {card: CheeseFactory, length: 4},
+        {card: FurnitureFactory, length: 4},
+        {card: Mine, length: 4},
+        {card: FamilyRestaurant, length: 4},
+        {card: AppleOrchard, length: 4},
+        {card: FruitAndVegetableMarket, length: 4},
+        {card: TelevisionStation, length: 4},
+        {card: Stadium, length: 4},
+    ]
 
+    static createCardStock() {
+        let ret = [];
+        for (let cardConfig of GameConfig.cardStock) {
+            ret = ret.concat(cardConfig.card.generate(cardConfig.length));
+        }
+        return ret;
+    }
 
-let players = [];
+};
 
 class Game {
 
@@ -14,6 +39,7 @@ class Game {
         this.$throwDiceButton = $('#player .dice .throwDiceButton');
         this.$doneButton  = $('#player .dice .doneButton');
         this.$diceResult = $('#player .dice .result');
+        this.isSuspend = false;
     };
 
     static getInstance() {
@@ -29,26 +55,9 @@ class Game {
 
     init() {
 
-        this.cardStock = this.cardStock.concat(Wheat.generate(4));
-        this.cardStock = this.cardStock.concat(StockFarm.generate(4));
-        this.cardStock = this.cardStock.concat(Bakery.generate(4));
-        this.cardStock = this.cardStock.concat(Cafe.generate(4));
-        this.cardStock = this.cardStock.concat(ConvenienceStore.generate(4));
-        this.cardStock = this.cardStock.concat(Forest.generate(4));
-        this.cardStock = this.cardStock.concat(Stadium.generate(4));
-        this.cardStock = this.cardStock.concat(CheeseFactory.generate(4));
-        this.cardStock = this.cardStock.concat(FurnitureFactory.generate(4));
-        this.cardStock = this.cardStock.concat(Mine.generate(4));
-        this.cardStock = this.cardStock.concat(FamilyRestaurant.generate(4));
-        this.cardStock = this.cardStock.concat(AppleOrchard.generate(4));
-        this.cardStock = this.cardStock.concat(FruitAndVegetableMarket.generate(4));
-        this.cardStock = this.cardStock.concat(TelevisionStation.generate(1));
-        this.cardStock = this.cardStock.concat(Stadium.generate(1));
-        // this.cardStock = this.cardStock.concat(BusinessCenter.generate(4));
-        this.cardStock = this.shuffleArray(this.cardStock);
+        this.cardStock = this.shuffleArray(GameConfig.createCardStock());
 
-        const _playerNames = ['Hiroshi', 'Rina'];
-        this.initPlayers(_playerNames);
+        this.initPlayers(GameConfig.playerNames);
         this.displayPlayerList();
         this.displayPlayerHand(this.getNowPlayer());
         this.displayPlayerLandmark(this.getNowPlayer());
@@ -96,11 +105,7 @@ class Game {
             function onClickCancelButton() {
                 $modal.remove();
                 this.getNowPlayer().throw(diceNumber);
-                this.enableBuySupplyBuildingAndLandmark();
                 this.$throwDiceButton.prop('disabled', true);
-                $('#player .dice .doneButton').prop('disabled', false);
-                this.$doneButton.focus();
-                radioTower.ableThrowAgain = true;
             };
 
             function onClickOkButton() {
@@ -120,22 +125,36 @@ class Game {
             this.$throwDiceButton.prop('disabled', true);
         } else {
             this.getNowPlayer().throw();
-            this.enableBuySupplyBuildingAndLandmark();
             this.$throwDiceButton.prop('disabled', true);
-            $('#player .dice .doneButton').prop('disabled', false);
-            this.$doneButton.focus();
-            radioTower.ableThrowAgain = true;
         }
     };
+
+    prepareNext() {
+        this.enableBuySupplyBuildingAndLandmark();
+        this.$throwDiceButton.prop('disabled', true);
+        $('#player .dice .doneButton').prop('disabled', false);
+        this.$doneButton.focus();
+        this.getNowPlayer().landmark[LANDMARK_KEY.RADIO_TOWER].ableThrowAgain = true;
+        this.isSuspend = false;
+        this.resetPlayerHandChecked();
+    }
+
+    resetPlayerHandChecked() {
+        for (let player of this.players) {
+            for (let card of player.hand) {
+                card.checked = false;
+            }
+        }
+    }
 
     initPlayers(names) {
         for (let name of names) {
             const supply = SupplyBuildingManager.getDefaultSupplyBuildingForPlayer();
             const landmark = LandmarkManager.getLandmarkForPlayer();
             const player = new Player(name, supply, landmark, 3);
-            const $tab = $('<li>').append($('<a>').text(name).attr('href', '#' + name));
+            const $tab = $('<li>').append($('<a>').text(name).attr('href', '#tab' + player.getId()));
             $('.tabs ul').append($tab);
-            $('.tabs').append($('<div>').addClass('innerTab').attr('id', name));
+            $('.tabs').append($('<div>').addClass('innerTab').attr('id', 'tab' + player.getId()));
             this.players.push(player);
         }
 
@@ -309,19 +328,19 @@ class Game {
         for (let player of this.players) {
             for (let card of player.hand) {
                 const $cardTemplate = $(card.getHtmlTemplate());
-                $('#' + player.name).append($cardTemplate.removeAttr('id'));
+                $('#tab' + player.getId()).append($cardTemplate.removeAttr('id'));
             }
             for (let key in player.landmark) {
                 const landmark = player.landmark[key];
                 const $cardTemplate = $(landmark.getHtmlTemplate());
-                $('#' + player.name).append($cardTemplate.removeAttr('id'));
+                $('#tab' + player.getId()).append($cardTemplate.removeAttr('id'));
             }
         }
     };
 
     clearAllPlayersHandAndLandmark() {
         for (let player of this.players) {
-            $('#' + player.name).find('.card').remove();
+            $('#tab' + player.getId()).find('.card').remove();
         }
     }
 };
