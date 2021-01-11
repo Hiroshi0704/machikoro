@@ -77,7 +77,8 @@ class SupplyBuilding {
 
             // 同じ紫カード複数所持不可
             const hasSamePurpleCard = (card) => card.name === this.name;
-            if (Game.getInstance().getNowPlayer().hand.findIndex(hasSamePurpleCard) !== -1) {
+            if (this.buildingType === BUILDING_TYPE.SPECIAL
+            && Game.getInstance().getNowPlayer().hand.findIndex(hasSamePurpleCard) !== -1) {
                 return;
             }
 
