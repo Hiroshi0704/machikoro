@@ -48,6 +48,7 @@ class Player {
         this.hand.push(card);
         this.sortHand();
         Game.getInstance().displayPlayerHand(this);
+        Game.getInstance().displayAllPlayersHandAndLandmark();
     };
 
     updateCoinsOnDisplay() {
@@ -82,18 +83,19 @@ class Player {
         return diceNumber;
     }
 
-    throw(debug) {
+    throw(number) {
         let diceNumber = 0;
-        if (this.isDoubleDiceMode()) {
-            diceNumber = this.dice.throw();
+        if (number !== undefined) {
+            diceNumber = number;
         } else {
-            diceNumber = this.dice.throwSingleDice();
+            if (this.isDoubleDiceMode()) {
+                diceNumber = this.dice.throw();
+            } else {
+                diceNumber = this.dice.throwSingleDice();
+            }
         }
 
-        // DEBUG
-        if (debug !== undefined) {
-            diceNumber = debug;
-        }
+        Logger.dice(diceNumber);
 
         const otherPlayer = Game.getInstance().players.filter(player => player !== this);
         for (let player of otherPlayer) {
@@ -144,6 +146,10 @@ class Player {
             if (a.activeNumber[0] > b.activeNumber[0]) {
                 return 1;
             } else {
+                if ((a.activeNumber[0] === b.activeNumber[0])
+                && (a.activeNumber.length > b.activeNumber.length)) {
+                    return 1;
+                }
                 return -1;
             }
         });

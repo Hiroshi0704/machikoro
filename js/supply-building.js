@@ -102,6 +102,7 @@ class SupplyBuilding {
         };
 
         function onClickOkButton() {
+            $modal.remove();
             const player = Game.getInstance().getNowPlayer();
             player.buy(this.cost);
             const game = Game.getInstance();
@@ -111,7 +112,6 @@ class SupplyBuilding {
                 delete game.publicCards[this.name];
             }
             game.dealCardStockToPublic();
-            $modal.remove();
             game.disableBuySupplyBuildingAndLandmark();
             this.deactivateClickEvent();
             Game.getInstance().$doneButton.focus();
@@ -380,6 +380,7 @@ class TelevisionStation extends SupplyBuilding {
             this.$modal.remove();
         }
         Waiter.waiting = false;
+        Game.getInstance().$doneButton.focus();
     };
 
     onClickModalPlayerButton(cardOwner, player, coin) {
@@ -390,6 +391,7 @@ class TelevisionStation extends SupplyBuilding {
         cardOwner.earn(income);
         Logger.info(`${cardOwner.name}は${this.name}で${player.name}から(${income})コインを得た。合計(${cardOwner.coins})コインです。`);
         Waiter.waiting = false;
+        Game.getInstance().$doneButton.focus();
     };
 
     getHtmlSelectPlayerModal() {

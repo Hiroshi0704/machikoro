@@ -42,15 +42,17 @@ class Game {
         this.cardStock = this.cardStock.concat(FamilyRestaurant.generate(4));
         this.cardStock = this.cardStock.concat(AppleOrchard.generate(4));
         this.cardStock = this.cardStock.concat(FruitAndVegetableMarket.generate(4));
-        this.cardStock = this.cardStock.concat(TelevisionStation.generate(4));
-        this.cardStock = this.cardStock.concat(BusinessCenter.generate(4));
+        this.cardStock = this.cardStock.concat(TelevisionStation.generate(1));
+        this.cardStock = this.cardStock.concat(Stadium.generate(1));
+        // this.cardStock = this.cardStock.concat(BusinessCenter.generate(4));
         this.cardStock = this.shuffleArray(this.cardStock);
 
-        const _playerNames = ['Hiroshi', 'Rina', 'Kanae', 'Sugita'];
+        const _playerNames = ['Hiroshi', 'Rina'];
         this.initPlayers(_playerNames);
         this.displayPlayerList();
         this.displayPlayerHand(this.getNowPlayer());
         this.displayPlayerLandmark(this.getNowPlayer());
+        this.displayAllPlayersHandAndLandmark();
         this.playerListTurn(this.getNowPlayer());
         this.enableDoubleDiceButtonIfAllowed(this.getNowPlayer());
         this.$throwDiceButton.off().on('click', this.onClickThrowDiceButton.bind(this));
@@ -85,14 +87,45 @@ class Game {
 
     onClickThrowDiceButton() {
         // 電波塔効果
-        if (this.getNowPlayer().landmark[LANDMARK_KEY.RADIO_TOWER].isActive()) {
+        const radioTower = this.getNowPlayer().landmark[LANDMARK_KEY.RADIO_TOWER];
+        if (radioTower.isActive() && radioTower.ableThrowAgain) {
+            const diceNumber = this.getNowPlayer().throwOnly();
+            let $modal = $(`<div id="radioToweModal" style="display: none;">振り直しますか？</div>`);
+            $modal.appendTo($('body'));
 
+            function onClickCancelButton() {
+                $modal.remove();
+                this.getNowPlayer().throw(diceNumber);
+                this.enableBuySupplyBuildingAndLandmark();
+                this.$throwDiceButton.prop('disabled', true);
+                $('#player .dice .doneButton').prop('disabled', false);
+                this.$doneButton.focus();
+                radioTower.ableThrowAgain = true;
+            };
+
+            function onClickOkButton() {
+                $modal.remove();
+                radioTower.ableThrowAgain = false;
+                this.onClickThrowDiceButton();
+            };
+
+            $modal = $modal.dialog({
+                modal: false,
+                close: onClickCancelButton.bind(this),
+                buttons: {
+                    'はい': onClickOkButton.bind(this),
+                    'いいえ': onClickCancelButton.bind(this)
+                }
+            });
+            this.$throwDiceButton.prop('disabled', true);
+        } else {
+            this.getNowPlayer().throw();
+            this.enableBuySupplyBuildingAndLandmark();
+            this.$throwDiceButton.prop('disabled', true);
+            $('#player .dice .doneButton').prop('disabled', false);
+            this.$doneButton.focus();
+            radioTower.ableThrowAgain = true;
         }
-        this.getNowPlayer().throw();
-        this.enableBuySupplyBuildingAndLandmark();
-        this.$throwDiceButton.prop('disabled', true);
-        $('#player .dice .doneButton').prop('disabled', false);
-        this.$doneButton.focus();
     };
 
     initPlayers(names) {
@@ -100,8 +133,15 @@ class Game {
             const supply = SupplyBuildingManager.getDefaultSupplyBuildingForPlayer();
             const landmark = LandmarkManager.getLandmarkForPlayer();
             const player = new Player(name, supply, landmark, 3);
+            const $tab = $('<li>').append($('<a>').text(name).attr('href', '#' + name));
+            $('.tabs ul').append($tab);
+            $('.tabs').append($('<div>').addClass('innerTab').attr('id', name));
             this.players.push(player);
         }
+
+        $('.tabs').tabs({
+            event: "mouseover",
+        });
     };
 
     getPlayers() {
@@ -264,13 +304,29 @@ class Game {
         $('#doubleDiceMode').prop('disabled', !player.isDoubleDiceAble());
     }
 
+    displayAllPlayersHandAndLandmark() {
+        this.clearAllPlayersHandAndLandmark();
+        for (let player of this.players) {
+            for (let card of player.hand) {
+                const $cardTemplate = $(card.getHtmlTemplate());
+                $('#' + player.name).append($cardTemplate.removeAttr('id'));
+            }
+            for (let key in player.landmark) {
+                const landmark = player.landmark[key];
+                const $cardTemplate = $(landmark.getHtmlTemplate());
+                $('#' + player.name).append($cardTemplate.removeAttr('id'));
+            }
+        }
+    };
+
+    clearAllPlayersHandAndLandmark() {
+        for (let player of this.players) {
+            $('#' + player.name).find('.card').remove();
+        }
+    }
 };
 
 window.onload = function() {
-
-    $('.tabs').tabs({
-        event: "mouseover",
-    });
 
     var game = Game.getInstance();
     game.start();

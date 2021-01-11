@@ -69,3 +69,9 @@ button:disabled {
 #player .dice .double {
     padding: 8px;
 }
+
+ul.ui-tabs-nav.ui-corner-all.ui-helper-reset.ui-helper-clearfix.ui-widget-header {
+    overflow-x: auto;
+    display: flex;
+    overflow-y: hidden;
+}
