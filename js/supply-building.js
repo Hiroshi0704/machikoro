@@ -74,6 +74,13 @@ class SupplyBuilding {
 
     activateClickEvent() {
         if (Game.getInstance().getNowPlayer().coins >= this.cost) {
+
+            // 同じ紫カード複数所持不可
+            const hasSamePurpleCard = (card) => card.name === this.name;
+            if (Game.getInstance().getNowPlayer().hand.findIndex(hasSamePurpleCard) !== -1) {
+                return;
+            }
+
             $('#' + this.getId()).click(this.onClick.bind(this));
             const intervalTime = 1000;
             this.interval = setInterval(function() {
