@@ -173,7 +173,7 @@ class Game {
 
     getNowPlayer() {
         return this.getPlayers()[0];
-    };
+    }
 
     getNextPlayer() {
         const players = this.getPlayers();
