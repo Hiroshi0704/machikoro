@@ -1,13 +1,14 @@
 .card {
-    width: 200px;
-    min-width: 200px;
+    width: 190px;
+    min-width: 190px;
     text-align: center;
     border-radius: 5px;
     border: 1px solid #ccc;
     display: inline-block;
     margin: 1px;
-    min-height: 220px;
-    max-height: 220px;
+    min-height: 210px;
+    max-height: 210px;
+    font-size: 16px;
 }
 .card .activeNumber {
     padding: 5px 10px;

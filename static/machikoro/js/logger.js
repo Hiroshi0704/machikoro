@@ -1,7 +1,7 @@
+"use strict";
+
 class Logger {
     constructor() {};
-
-    static diceNumbers = [];
 
     static info(log) {
         const $log = $('#log');
@@ -40,3 +40,5 @@ class Logger {
     }
 
 };
+
+Logger.diceNumbers = [];

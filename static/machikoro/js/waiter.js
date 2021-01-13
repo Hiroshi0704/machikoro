@@ -1,8 +1,8 @@
+"use strict";
 
 class Waiter {
-    constructor() {};
 
-    static waiting = false;
+    constructor() {};
 
     static wait() {
         if (Waiter.waiting) {
@@ -11,3 +11,5 @@ class Waiter {
         }
     };
 };
+
+Waiter.waiting = false;

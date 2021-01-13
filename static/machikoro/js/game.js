@@ -1,21 +1,6 @@
+'use strict';
+
 class GameConfig {
-    static playerNames = ['Player1', 'Player2', 'Player3', 'Player4'];
-    static cardStock = [
-        {card: Wheat, length: 4},
-        {card: StockFarm, length: 4},
-        {card: Bakery, length: 4},
-        {card: Cafe, length: 4},
-        {card: ConvenienceStore, length: 4},
-        {card: Forest, length: 4},
-        {card: CheeseFactory, length: 4},
-        {card: FurnitureFactory, length: 4},
-        {card: Mine, length: 4},
-        {card: FamilyRestaurant, length: 4},
-        {card: AppleOrchard, length: 4},
-        {card: FruitAndVegetableMarket, length: 4},
-        {card: TelevisionStation, length: 4},
-        {card: Stadium, length: 4},
-    ]
 
     static createCardStock() {
         let ret = [];
@@ -27,9 +12,33 @@ class GameConfig {
 
 };
 
-class Game {
+GameConfig.playerNames = ['Player1', 'Player2', 'Player3', 'Player4'];
+GameConfig.cardStock = [
+    {card: Wheat, length: 6},
+    {card: StockFarm, length: 6},
+    {card: Bakery, length: 6},
+    {card: Cafe, length: 6},
+    {card: ConvenienceStore, length: 6},
+    {card: Forest, length: 6},
+    {card: CheeseFactory, length: 6},
+    {card: FurnitureFactory, length: 6},
+    {card: Mine, length: 6},
+    {card: FamilyRestaurant, length: 6},
+    {card: AppleOrchard, length: 6},
+    {card: FruitAndVegetableMarket, length: 6},
 
-    static game = null;
+    // 特殊カード
+    {card: TelevisionStation, length: 4},
+    {card: Stadium, length: 4},
+
+    // 町コロ＋
+    {card: FlowerGarden, length: 6},
+    {card: FlowerShop, length: 6},
+    {card: Pizzeria, length: 0},
+    {card: HamburgerShop, length: 0},
+];
+
+class Game {
 
     constructor() {
         this.players = [];
@@ -70,7 +79,25 @@ class Game {
         this.dealCardStockToPublic();
         $('#doubleDiceMode').change(this.onChangeDoubleDiceMode.bind(this));
         this.$throwDiceButton.focus();
+        $(`a[href="#tab${this.getNowPlayer().getId()}"]`).mouseover();
     }
+
+    initPlayers(names) {
+        for (let name of names) {
+            const supply = SupplyBuildingManager.getDefaultSupplyBuildingForPlayer();
+            const landmark = LandmarkManager.getLandmarkForPlayer();
+            const player = new Player(name, supply, landmark, 3);
+            const $a = $('<a>').attr('href', '#tab' + player.getId()).append($(player.getHtmlName()));
+            const $tab = $('<li>').append($a);
+            $('.tabs ul').append($tab);
+            $('.tabs').append($('<div>').addClass('innerTab').attr('id', 'tab' + player.getId()));
+            this.players.push(player);
+        }
+
+        $('.tabs').tabs({
+            event: "mouseover",
+        });
+    };
 
     onClickDoneButton() {
         Logger.update();
@@ -92,6 +119,7 @@ class Game {
         this.$doneButton.prop('disabled', true);
         this.$diceResult.val('');
         this.$throwDiceButton.focus();
+        $(`a[href="#tab${nextPlayer.getId()}"]`).mouseover();
     };
 
     onClickThrowDiceButton() {
@@ -130,6 +158,11 @@ class Game {
     };
 
     prepareNext() {
+        // 所持コインが0の場合は銀行から1コインもらう
+        if (this.getNowPlayer().coins === 0) {
+            this.getNowPlayer().earn(1);
+            Logger.info(`${this.getNowPlayer().getHtmlName()}は銀行から(1)コインを得た。`);
+        }
         this.enableBuySupplyBuildingAndLandmark();
         this.$throwDiceButton.prop('disabled', true);
         $('#player .dice .doneButton').prop('disabled', false);
@@ -146,22 +179,6 @@ class Game {
             }
         }
     }
-
-    initPlayers(names) {
-        for (let name of names) {
-            const supply = SupplyBuildingManager.getDefaultSupplyBuildingForPlayer();
-            const landmark = LandmarkManager.getLandmarkForPlayer();
-            const player = new Player(name, supply, landmark, 3);
-            const $tab = $('<li>').append($('<a>').text(name).attr('href', '#tab' + player.getId()));
-            $('.tabs ul').append($tab);
-            $('.tabs').append($('<div>').addClass('innerTab').attr('id', 'tab' + player.getId()));
-            this.players.push(player);
-        }
-
-        $('.tabs').tabs({
-            event: "mouseover",
-        });
-    };
 
     getPlayers() {
         return this.players;
@@ -232,7 +249,7 @@ class Game {
 
     displayPlayerList() {
         for (let player of this.getPlayers()) {
-            $('.playerList').append($(`<div class="${player.getId()}">${player.name}(<span class="coins">${player.coins}</span>)<span class="turn">●</span></div>`));
+            $('.playerList').append($(`<div class="${player.getId()}">${player.getHtmlName()}(<span class="coins">${player.coins}</span>)<span class="turn">●</span></div>`));
         }
     };
 
@@ -325,15 +342,15 @@ class Game {
 
     displayAllPlayersHandAndLandmark() {
         this.clearAllPlayersHandAndLandmark();
-        for (let player of this.players) {
+        for (let player of this.getPlayers()) {
             for (let card of player.hand) {
-                const $cardTemplate = $(card.getHtmlTemplate());
-                $('#tab' + player.getId()).append($cardTemplate.removeAttr('id'));
+                const $cardTemplate = $(card.getHtmlTemplate()).removeAttr('id');
+                $('#tab' + player.getId()).append($cardTemplate);
             }
             for (let key in player.landmark) {
                 const landmark = player.landmark[key];
-                const $cardTemplate = $(landmark.getHtmlTemplate());
-                $('#tab' + player.getId()).append($cardTemplate.removeAttr('id'));
+                const $cardTemplate = $(landmark.getHtmlTemplate()).removeAttr('id');
+                $('#tab' + player.getId()).append($cardTemplate);
             }
         }
     };
@@ -344,6 +361,8 @@ class Game {
         }
     }
 };
+
+Game.game = null;
 
 window.onload = function() {
 

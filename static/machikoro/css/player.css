@@ -16,7 +16,8 @@
 #player .tabs .innerTab {
     overflow-x: auto;
     display: flex;
-    height: 280px;
+    height: 276px;
+    padding: 30px 10px;
 }
 
 #player .playerList {
@@ -74,4 +75,20 @@ ul.ui-tabs-nav.ui-corner-all.ui-helper-reset.ui-helper-clearfix.ui-widget-header
     overflow-x: auto;
     display: flex;
     overflow-y: hidden;
+}
+
+.player1 {
+    color: #007bff;
+}
+
+.player2 {
+    color: #dc3545;
+}
+
+.player3 {
+    color: #d39e00;
+}
+
+.player4 {
+    color: #1e7e34;
 }

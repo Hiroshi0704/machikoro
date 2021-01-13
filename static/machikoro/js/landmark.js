@@ -1,7 +1,6 @@
+"use strict";
 
 class Landmark {
-
-    static id = 0;
 
     constructor(name, cost, explanation) {
         this.name = name;
@@ -17,7 +16,7 @@ class Landmark {
     }
 
     getHtmlTemplate() {
-        return `<div id="${this.getId()}" class="card landmark ${this.active ? 'active' : ''}">
+        return `<div id="${this.getId()}" class="${this.getId()} card landmark ${this.active ? 'active' : ''}">
                     <div class="activeNumber"></div>
                     <div class="name">
                         <span class="buildingType ${BUILDING_TYPE.SPECIAL}"></span>
@@ -44,13 +43,13 @@ class Landmark {
 
     activateClickEvent() {
         if (!this.isActive() && Game.getInstance().getNowPlayer().coins >= this.cost) {
-            $('#' + this.getId()).click(this.onClick.bind(this));
+            $('.' + this.getId()).click(this.onClick.bind(this));
             const intervalTime = 1000;
             this.interval = setInterval(function() {
-                $('#' + this.getId()).animate({
+                $('.' + this.getId()).animate({
                     opacity: '60%'
                 }, intervalTime / 2);
-                $('#' + this.getId()).animate({
+                $('.' + this.getId()).animate({
                     opacity: '100%'
                 }, intervalTime / 2);
             }.bind(this), intervalTime + 1200);
@@ -58,7 +57,7 @@ class Landmark {
     }
 
     deactivateClickEvent() {
-        $('#' + this.getId()).off();
+        $('.' + this.getId()).off();
         clearInterval(this.interval);
     };
 
@@ -77,6 +76,7 @@ class Landmark {
             player.buy(this.cost);
             this.setActive(true);
             game.displayPlayerLandmark(player);
+            game.displayAllPlayersHandAndLandmark();
             $modal.remove();
             game.disableBuySupplyBuildingAndLandmark();
             this.deactivateClickEvent();
@@ -96,6 +96,8 @@ class Landmark {
     }
 
 };
+
+Landmark.id = 0;
 
 class Station extends Landmark {
     constructor() {

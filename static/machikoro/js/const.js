@@ -1,3 +1,4 @@
+"use strict";
 
 const CARD_COLOR = {
     BLUE: 'blue',

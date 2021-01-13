@@ -1,7 +1,6 @@
+"use strict";
 
 class Player {
-
-    static id = 0;
 
     constructor(name, hand, landmark, coins) {
         this.name = name;
@@ -12,10 +11,15 @@ class Player {
         this.dice = new DoubleDice();
         this.id = Player.id;
         Player.id++;
+        this.cssClass = 'player' + this.id;
     };
 
     getId() {
         return 'playerId-' + this.id;
+    }
+
+    getHtmlName() {
+        return `<span class="${this.cssClass}">${this.name}</span>`;
     }
 
     buy(cost) {
@@ -192,3 +196,5 @@ class Player {
         });
     }
 };
+
+Player.id = 1;

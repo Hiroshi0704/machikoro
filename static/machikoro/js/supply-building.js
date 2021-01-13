@@ -1,7 +1,6 @@
+"use strict";
 
 class SupplyBuilding {
-
-    static id = 0;
 
     constructor(name, cardColor, cost, activeNumber, explanation, buildingType, coin) {
         this.name = name;
@@ -157,6 +156,8 @@ class SupplyBuilding {
     };
 };
 
+SupplyBuilding.id = 0;
+
 class Wheat extends SupplyBuilding {
     constructor() {
         const explanation = '誰のターンでも銀行から1コインをもらう';
@@ -166,7 +167,7 @@ class Wheat extends SupplyBuilding {
     invoke(_diceNumber, _diceThrower, cardOwner, _players) {
         const coin = this.getTotalCoin();
         cardOwner.earn(coin);
-        Logger.info(`${cardOwner.name}は${this.name}で(${coin})コインを得た。合計は(${cardOwner.coins})コインです。`);
+        Logger.info(`${cardOwner.getHtmlName()}は${this.name}で(${coin})コインを得た。合計(${cardOwner.coins})コイン。`);
     };
 };
 
@@ -179,7 +180,7 @@ class StockFarm extends SupplyBuilding {
     invoke(_diceNumber, _diceThrower, cardOwner, _players) {
         const coin = this.getTotalCoin();
         cardOwner.earn(coin);
-        Logger.info(`${cardOwner.name}は${this.name}で(${coin})コインを得た。合計は(${cardOwner.coins})コインです。`);
+        Logger.info(`${cardOwner.getHtmlName()}は${this.name}で(${coin})コインを得た。合計(${cardOwner.coins})コイン。`);
     };
 };
 
@@ -192,7 +193,7 @@ class Bakery extends SupplyBuilding {
     invoke(_diceNumber, _diceThrower, cardOwner, _players) {
         const coin = this.getTotalCoin();
         cardOwner.earn(coin);
-        Logger.info(`${cardOwner.name}は${this.name}で(${coin})コインを得た。合計は(${cardOwner.coins})コインです。`);
+        Logger.info(`${cardOwner.getHtmlName()}は${this.name}で(${coin})コインを得た。合計(${cardOwner.coins})コイン。`);
     };
 };
 
@@ -208,9 +209,9 @@ class Cafe extends SupplyBuilding {
         let income = 0;
         const paid = nowPlayer.pay(coin);
         income += paid;
-        Logger.info(`${cardOwner.name}は${this.name}で${nowPlayer.name}から(${paid})コインを得た。`);
+        Logger.info(`${cardOwner.getHtmlName()}は${this.name}で${nowPlayer.getHtmlName()}から(${paid})コインを得た。`);
         cardOwner.earn(income);
-        // Logger.info(`${cardOwner.name}は${this.name}で合計で(${income})コインを得た。合計(${cardOwner.coins})コインです`);
+        // Logger.info(`${cardOwner.getHtmlName()}は${this.name}で合計で(${income})コインを得た。合計(${cardOwner.coins})コイン。`);
     };
 };
 
@@ -223,7 +224,7 @@ class ConvenienceStore extends SupplyBuilding {
     invoke(_diceNumber, _diceThrower, cardOwner, _players) {
         const coin = this.getTotalCoin();
         cardOwner.earn(coin);
-        Logger.info(`${cardOwner.name}は${this.name}で(${coin})コインを得た。合計は(${cardOwner.coins})コインです。`);
+        Logger.info(`${cardOwner.getHtmlName()}は${this.name}で(${coin})コインを得た。合計(${cardOwner.coins})コイン。`);
     };
 };
 
@@ -236,7 +237,7 @@ class Forest extends SupplyBuilding {
     invoke(_diceNumber, _diceThrower, cardOwner, _players) {
         const coin = this.getTotalCoin();
         cardOwner.earn(coin);
-        Logger.info(`${cardOwner.name}は${this.name}で(${coin})コインを得た。合計は(${cardOwner.coins})コインです。`);
+        Logger.info(`${cardOwner.getHtmlName()}は${this.name}で(${coin})コインを得た。合計(${cardOwner.coins})コイン。`);
     };
 };
 
@@ -251,7 +252,7 @@ class CheeseFactory extends SupplyBuilding {
         const cards = cardOwner.hand.filter(card => card.buildingType === BUILDING_TYPE.ANIMAL);
         let income = coin * cards.length;
         cardOwner.earn(income);
-        Logger.info(`${cardOwner.name}は${this.name}で(${income})コインを得た。合計は(${cardOwner.coins})コインです。`);
+        Logger.info(`${cardOwner.getHtmlName()}は${this.name}で(${income})コインを得た。合計(${cardOwner.coins})コイン。`);
     };
 };
 
@@ -266,7 +267,7 @@ class FurnitureFactory extends SupplyBuilding {
         const cards = cardOwner.hand.filter(card => card.buildingType === BUILDING_TYPE.MINERAL);
         let income = coin * cards.length;
         cardOwner.earn(income);
-        Logger.info(`${cardOwner.name}は${this.name}で(${income})コインを得た。合計は(${cardOwner.coins})コインです。`);
+        Logger.info(`${cardOwner.getHtmlName()}は${this.name}で(${income})コインを得た。合計(${cardOwner.coins})コイン。`);
     };
 };
 
@@ -280,7 +281,7 @@ class Mine extends SupplyBuilding {
         const coin = this.getTotalCoin();
         let income = coin;
         cardOwner.earn(income);
-        Logger.info(`${cardOwner.name}は${this.name}で(${income})コインを得た。合計は(${cardOwner.coins})コインです。`);
+        Logger.info(`${cardOwner.getHtmlName()}は${this.name}で(${income})コインを得た。合計(${cardOwner.coins})コイン。`);
     };
 };
 
@@ -296,9 +297,9 @@ class FamilyRestaurant extends SupplyBuilding {
         let income = 0;
         const paid = nowPlayer.pay(coin);
         income += paid;
-        Logger.info(`${cardOwner.name}は${this.name}で${nowPlayer.name}から(${paid})コインを得た。`);
+        Logger.info(`${cardOwner.getHtmlName()}は${this.name}で${nowPlayer.name}から(${paid})コインを得た。`);
         cardOwner.earn(income);
-        // Logger.info(`${cardOwner.name}は${this.name}で合計で(${income})コインを得た。合計(${cardOwner.coins})コインです`);
+        // Logger.info(`${cardOwner.getHtmlName()}は${this.name}で合計で(${income})コインを得た。合計(${cardOwner.coins})コイン。`);
     };
 };
 
@@ -312,7 +313,7 @@ class AppleOrchard extends SupplyBuilding {
         const coin = this.getTotalCoin();
         let income = coin;
         cardOwner.earn(income);
-        Logger.info(`${cardOwner.name}は${this.name}で(${income})コインを得た。合計は(${cardOwner.coins})コインです。`);
+        Logger.info(`${cardOwner.getHtmlName()}は${this.name}で(${income})コインを得た。合計(${cardOwner.coins})コイン。`);
     };
 };
 
@@ -327,7 +328,7 @@ class FruitAndVegetableMarket extends SupplyBuilding {
         const cards = cardOwner.hand.filter(card => card.buildingType === BUILDING_TYPE.PLANT);
         let income = coin * cards.length;
         cardOwner.earn(income);
-        Logger.info(`${cardOwner.name}は${this.name}で(${income})コインを得た。合計は(${cardOwner.coins})コインです。`);
+        Logger.info(`${cardOwner.getHtmlName()}は${this.name}で(${income})コインを得た。合計(${cardOwner.coins})コイン。`);
     };
 };
 
@@ -344,10 +345,10 @@ class Stadium extends SupplyBuilding {
         for (let player of others) {
             const paid = player.pay(coin);
             income += paid;
-            Logger.info(`${cardOwner.name}は${this.name}で${player.name}から(${paid})コインを得た。`);
+            Logger.info(`${cardOwner.getHtmlName()}は${this.name}で${player.getHtmlName()}から(${paid})コインを得た。`);
         }
         cardOwner.earn(income);
-        Logger.info(`${cardOwner.name}は${this.name}で合計で(${income})コインを得た。合計(${cardOwner.coins})コインです`);
+        Logger.info(`${cardOwner.getHtmlName()}は${this.name}で合計で(${income})コインを得た。合計(${cardOwner.coins})コイン。`);
     };
 };
 
@@ -398,7 +399,7 @@ class TelevisionStation extends SupplyBuilding {
         }
         let income = player.pay(coin);
         cardOwner.earn(income);
-        Logger.info(`${cardOwner.name}は${this.name}で${player.name}から(${income})コインを得た。合計(${cardOwner.coins})コインです。`);
+        Logger.info(`${cardOwner.getHtmlName()}は${this.name}で${player.getHtmlName()}から(${income})コインを得た。合計(${cardOwner.coins})コイン。`);
         Game.getInstance().$doneButton.prop('disabled', false);
         Game.getInstance().$doneButton.focus();
         Game.getInstance().isSuspend = false;
@@ -426,6 +427,68 @@ class BusinessCenter extends SupplyBuilding {
     };
 };
 
+// 町コロ＋
+class FlowerGarden extends SupplyBuilding {
+    constructor() {
+        const explanation = '誰のターンでも銀行から1コインをもらう';
+        super('花畑', CARD_COLOR.BLUE, 2, [4], explanation, BUILDING_TYPE.PLANT, 1);
+    };
+
+    invoke(_diceNumber, _diceThrower, cardOwner, _players) {
+        const coin = this.getTotalCoin();
+        cardOwner.earn(coin);
+        Logger.info(`${cardOwner.getHtmlName()}は${this.name}で(${coin})コインを得た。合計(${cardOwner.coins})コイン。`);
+    };
+};
+
+class FlowerShop extends SupplyBuilding {
+    constructor() {
+        const explanation = `自分のターンなら、銀行から自分の「花畑」1軒つき1コインもらう`;
+        super('フラワーショップ', CARD_COLOR.GREEN, 1, [6], explanation, BUILDING_TYPE.SHOP, 1);
+    };
+
+    invoke(_diceNumber, _diceThrower, cardOwner, _players) {
+        const coin = this.getTotalCoin();
+        const cards = cardOwner.hand.filter(card => card.name === '花畑');
+        let income = coin * cards.length;
+        cardOwner.earn(income);
+        Logger.info(`${cardOwner.getHtmlName()}は${this.name}で(${income})コインを得た。合計(${cardOwner.coins})コイン。`);
+    };
+};
+
+class Pizzeria extends SupplyBuilding {
+    constructor() {
+        const explanation = '目を出したプレイヤーから1コインもらう';
+        super('ピザ屋', CARD_COLOR.RED, 1, [7], explanation, BUILDING_TYPE.CAFE, 1);
+    };
+
+    invoke(_diceNumber, _diceThrower, cardOwner, _players) {
+        const coin = this.getTotalCoin();
+        const nowPlayer = Game.getInstance().getNowPlayer();
+        let income = 0;
+        const paid = nowPlayer.pay(coin);
+        income += paid;
+        Logger.info(`${cardOwner.getHtmlName()}は${this.name}で${nowPlayer.getHtmlName()}から(${paid})コインを得た。`);
+        cardOwner.earn(income);
+    };
+};
+
+class HamburgerShop extends SupplyBuilding {
+    constructor() {
+        const explanation = '目を出したプレイヤーから1コインもらう';
+        super('バーガーショップ', CARD_COLOR.RED, 1, [8], explanation, BUILDING_TYPE.CAFE, 1);
+    };
+
+    invoke(_diceNumber, _diceThrower, cardOwner, _players) {
+        const coin = this.getTotalCoin();
+        const nowPlayer = Game.getInstance().getNowPlayer();
+        let income = 0;
+        const paid = nowPlayer.pay(coin);
+        income += paid;
+        Logger.info(`${cardOwner.getHtmlName()}は${this.name}で${nowPlayer.getHtmlName()}から(${paid})コインを得た。`);
+        cardOwner.earn(income);
+    };
+};
 
 class SupplyBuildingManager {
     constructor() {};
