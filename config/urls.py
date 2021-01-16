@@ -17,11 +17,8 @@ from django.contrib import admin
 from django.urls import path
 from django.views.generic import TemplateView
 
-from chat.views import room
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', TemplateView.as_view(template_name='machikoro/index.html'), name='machikoro'),
-    path('chat/', TemplateView.as_view(template_name='chat/index.html'), name='chat'),
-    path('chat/<str:room_name>/', room, name='room'),
+    path('machikoro/<str:room_name>/', TemplateView.as_view(template_name='machikoro/index.html'), name='machikoro'),
 ]

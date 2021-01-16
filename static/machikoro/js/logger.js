@@ -4,16 +4,11 @@ class Logger {
     constructor() {};
 
     static info(log) {
-        const $log = $('#log');
-        $log.append(`<p class="new">${log}</p>`);
-        Logger.scrollToBottom();
+        Game.getInstance().socket.send(JSON.stringify({'log': log}));
     };
 
     static dice(diceNumber) {
-        const $log = $('#log');
-        $log.append(`<p>サイコロ: ${diceNumber}</p>`);
-        Logger.diceNumbers.push(diceNumber);
-        Logger.scrollToBottom();
+        Game.getInstance().socket.send(JSON.stringify({'logDiceNumber': diceNumber}));
     }
 
     static update() {
@@ -37,6 +32,19 @@ class Logger {
         }
         ret.numberCount = numberCount;
         return ret;
+    }
+
+    static outputLog(log) {
+        const $log = $('#log');
+        $log.append(`<p class="new">${log}</p>`);
+        Logger.scrollToBottom();
+    }
+
+    static outputDice(diceNumber) {
+        const $log = $('#log');
+        $log.append(`<p class="new">サイコロ: ${diceNumber}</p>`);
+        Logger.diceNumbers.push(diceNumber);
+        Logger.scrollToBottom();
     }
 
 };

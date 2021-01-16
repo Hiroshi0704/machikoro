@@ -2,7 +2,7 @@
 
 class Player {
 
-    constructor(name, hand, landmark, coins) {
+    constructor(name, hand, landmark, coins, channelName) {
         this.name = name;
         this.hand = hand;
         this.landmark = landmark;
@@ -11,7 +11,9 @@ class Player {
         this.dice = new DoubleDice();
         this.id = Player.id;
         Player.id++;
-        this.cssClass = 'player' + this.id;
+        this.cssClass = name;
+        this.className = this.constructor.name;
+        this.channelName = channelName;
     };
 
     getId() {

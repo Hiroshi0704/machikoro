@@ -25,6 +25,7 @@
     <script type="text/javascript" src="{% static 'machikoro/js/supply-building.js' %}"></script>
     <script type="text/javascript" src="{% static 'machikoro/js/landmark.js' %}"></script>
     <script type="text/javascript" src="{% static 'machikoro/js/player.js' %}"></script>
+    <script type="text/javascript" src="{% static 'machikoro/js/socket.js' %}"></script>
     <script type="text/javascript" src="{% static 'machikoro/js/game.js' %}"></script>
 </head>
 <body>
@@ -36,16 +37,18 @@
                 <div class="tabs">
                     <ul>
                         <li><a href="#tabsLandmark">ランドマーク</a></li>
-                        <li><a href="#tabsBlue">青カード</a></li>
+                        <!-- <li><a href="#tabsBlue">青カード</a></li>
                         <li><a href="#tabsGreen">緑カード</a></li>
                         <li><a href="#tabsRed">赤カード</a></li>
                         <li><a href="#tabsPurple">紫カード</a></li>
+                         -->
                     </ul>
                     <div id="tabsLandmark" class="innerTab"></div>
-                    <div id="tabsBlue" class="innerTab"></div>
+                    <!-- <div id="tabsBlue" class="innerTab"></div>
                     <div id="tabsGreen" class="innerTab"></div>
                     <div id="tabsRed" class="innerTab"></div>
                     <div id="tabsPurple" class="innerTab"></div>
+                     -->
                 </div>
             </div>
             <div class=playerSideBar>
@@ -54,7 +57,7 @@
                     <input class="result" type="text" readonly>
                     <div class="double">
                         <input id="doubleDiceMode" class="form-check-input" type="checkbox" data-toggle="toggle">
-                        <label for="doubleDiceMode" class="form-check-label ml-2">2個</label>
+                        <label for="doubleDiceMode" class="form-check-label pl-2">2個</label>
                     </div>
                     <button class="throwDiceButton btn btn-warning btn-block">サイコロ</button>
                     <button class="doneButton btn btn-info btn-block">完了</button>

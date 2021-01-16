@@ -5,6 +5,7 @@ class Dice {
     constructor() {
         this.numbers = [1, 2, 3, 4, 5, 6];
         this.number;
+        this.className = this.constructor.name;
     };
 
     throw() {
@@ -20,6 +21,7 @@ class DoubleDice {
         this.dice1 = new Dice();
         this.dice2 = new Dice();
         this.isDoubleMode = false;
+        this.className = this.constructor.name;
     };
 
     throw() {

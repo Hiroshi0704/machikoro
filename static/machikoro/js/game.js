@@ -38,6 +38,7 @@ GameConfig.cardStock = [
     {card: HamburgerShop, length: 0},
 ];
 
+
 class Game {
 
     constructor() {
@@ -49,6 +50,11 @@ class Game {
         this.$doneButton  = $('#player .dice .doneButton');
         this.$diceResult = $('#player .dice .result');
         this.isSuspend = false;
+        const loc = window.location;
+        this.socket = new WebSocket('ws://' + loc.host + '/ws' + loc.pathname);
+        this.socket.onopen = this.onopen.bind(this);
+        this.socket.onmessage = this.onmessage.bind(this);
+        this.className = this.constructor.name;
     };
 
     static getInstance() {
@@ -63,7 +69,6 @@ class Game {
     };
 
     init() {
-
         this.cardStock = this.shuffleArray(GameConfig.createCardStock());
 
         this.initPlayers(GameConfig.playerNames);
@@ -82,11 +87,116 @@ class Game {
         $(`a[href="#tab${this.getNowPlayer().getId()}"]`).mouseover();
     }
 
+    onopen(event) {
+        console.log('conected', event);
+        // this.sendGame();
+    }
+
+    onmessage(event) {
+        console.log('received', event);
+        const data = JSON.parse(event.data);
+        if (data.game !== undefined) {
+            this.receiveGame(event, data);
+        } else if (data.log !== undefined) {
+            this.receiveLog(event, data);
+        } else if (data.logDiceNumber !== undefined) {
+            this.receiveLogDiceNumber(event, data);
+        } else if (data.channel_name !== undefined) {
+            this.receiveChannelName(event, data);
+        } else if (data.updatePlayers !== undefined) {
+            this.receiveUpdatePlayers(event, data);
+        } else if (data.gameStart) {
+            this.receiveGameStart(event, data);
+        }
+    }
+
+    receiveGame(_event, data) {
+        Logger.update();
+        const _game = Game.toClass(data.game, this.className);
+        let _players = _game.players.map(data => Game.toClass(data, data.className));
+        for (let player of _players) {
+            player.dice = Game.toClass(player.dice, player.dice.className);
+            player.dice.dice1 = Game.toClass(player.dice.dice1, player.dice.dice1.className);
+            player.dice.dice2 = Game.toClass(player.dice.dice2, player.dice.dice2.className);
+            player.hand = player.hand.map(card => Game.toClass(card, card.className));
+            for (let key of Object.keys(player.landmark)) {
+                const landmark = player.landmark[key];
+                player.landmark[key] = Game.toClass(landmark, landmark.className);
+            }
+        }
+        Game.getInstance().players = _players;
+        Game.getInstance().cardStock = _game.cardStock.map(card => Game.toClass(card, card.className));
+        Game.getInstance().publicCards = this.loadPublicCards(_game.publicCards);
+
+        const player = this.getNowPlayer();
+        this.displayPlayerHand(player);
+        this.displayPlayerLandmark(player);
+        this.playerListTurn(player);
+        this.enableDoubleDiceButtonIfAllowed(player);
+        this.disableBuySupplyBuildingAndLandmark();
+        this.displayPublicCards();
+        this.displayAllPlayersHandAndLandmark();
+        this.$throwDiceButton.prop('disabled', false);
+        this.$doneButton.prop('disabled', true);
+        this.$diceResult.val('');
+        this.$throwDiceButton.focus();
+        $(`a[href="#tab${player.getId()}"]`).mouseover();
+
+        for (let player of this.players) {
+            player.updateCoinsOnDisplay();
+        }
+
+        if (player.channelName !== Game.channelName) {
+            this.$throwDiceButton.prop('disabled', true);
+        }
+    }
+
+    receiveLog(_event, data) {
+        Logger.outputLog(data.log);
+    }
+
+    receiveLogDiceNumber(_event, data) {
+        Logger.outputDice(data.logDiceNumber);
+    }
+
+    receiveChannelName(_event, data) {
+        if (Game.channelName === null) {
+            Game.channelName = data.channel_name;
+        }
+        Game.channels = data.channels;
+    }
+
+    receiveUpdatePlayers(_event, data) {
+        this.players = data.updatePlayers.map(player => Game.toClass(player, player.className));
+    }
+
+    receiveGameStart(_event, _data) {
+        $('#startDialog').remove();
+        this.players = [];
+        this.start();
+
+        if (Game.starter) {
+            this.sendGame();
+        }
+    }
+
+    sendGame() {
+        const data = {
+            'game': {
+                'players': this.players,
+                'cardStock': this.cardStock,
+                'publicCards': this.publicCards,
+            },
+        }
+        this.socket.send(JSON.stringify(data));
+    }
+
     initPlayers(names) {
-        for (let name of names) {
+        for (let i in Game.channels) {
+            const channel_name = Game.channels[i];
             const supply = SupplyBuildingManager.getDefaultSupplyBuildingForPlayer();
             const landmark = LandmarkManager.getLandmarkForPlayer();
-            const player = new Player(name, supply, landmark, 3);
+            const player = new Player(names[i], supply, landmark, 3, channel_name);
             const $a = $('<a>').attr('href', '#tab' + player.getId()).append($(player.getHtmlName()));
             const $tab = $('<li>').append($a);
             $('.tabs ul').append($tab);
@@ -100,7 +210,6 @@ class Game {
     };
 
     onClickDoneButton() {
-        Logger.update();
         // 遊園地効果
         let nextPlayer;
         const diceInfo = this.getNowPlayer().dice.getDiceInfo();
@@ -120,6 +229,7 @@ class Game {
         this.$diceResult.val('');
         this.$throwDiceButton.focus();
         $(`a[href="#tab${nextPlayer.getId()}"]`).mouseover();
+        this.sendGame();
     };
 
     onClickThrowDiceButton() {
@@ -311,10 +421,10 @@ class Game {
 
         while (Object.keys(this.publicCards).length < 8 && this.cardStock.length >= 1) {
             const nextCard = this.cardStock.shift();
-            if (this.publicCards[nextCard.name] === undefined) {
-                this.publicCards[nextCard.name] = [];
+            if (this.publicCards[nextCard.className] === undefined) {
+                this.publicCards[nextCard.className] = [];
             }
-            this.publicCards[nextCard.name].push(nextCard);
+            this.publicCards[nextCard.className].push(nextCard);
         }
 
         const $public = $('#public');
@@ -324,6 +434,15 @@ class Game {
             $public.append($(card.getHtmlTemplate()));
         }
     };
+
+    displayPublicCards() {
+        const $public = $('#public');
+        $public.find('.card').remove();
+        for(let key of Object.keys(this.publicCards)) {
+            const card = this.publicCards[key][0];
+            $public.append($(card.getHtmlTemplate()));
+        }
+    }
 
     onChangeDoubleDiceMode() {
         const isDouble = $('#doubleDiceMode').prop('checked');
@@ -360,13 +479,39 @@ class Game {
             $('#tab' + player.getId()).find('.card').remove();
         }
     }
+
+    static toClass(data, className) {
+        function getClass(className){return Function('return (' + className + ')')();}
+        const clazz = getClass(className);
+        return Object.setPrototypeOf(data, clazz.prototype);
+    }
+
+    loadPublicCards(plainPublicCards) {
+        let ret = {};
+        for (let key of Object.keys(plainPublicCards)) {
+            const cardList = plainPublicCards[key];
+            ret[key] = cardList.map(card => Game.toClass(card, card.className));
+        }
+        return ret;
+    }
 };
 
 Game.game = null;
+Game.channelName = null;
+Game.starter = false
 
 window.onload = function() {
 
     var game = Game.getInstance();
-    game.start();
+
+    $('<div id="startDialog">').dialog({
+        modal: true,
+        buttons: {
+            'スタート': function() {
+                game.socket.send(JSON.stringify({'gameStart': true}));
+                Game.starter = true;
+            }
+        }
+    })
 
 };

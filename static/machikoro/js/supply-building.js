@@ -14,6 +14,7 @@ class SupplyBuilding {
         this.extraCoin = 0;
         SupplyBuilding.id++;
         this.checked = false;
+        this.className = this.constructor.name;
     };
 
     getId() {
@@ -499,4 +500,5 @@ class SupplyBuildingManager {
             new Bakery(),
         ];
     };
+
 }

@@ -9,6 +9,7 @@ class Landmark {
         this.active = false;
         this.id = Landmark.id;
         Landmark.id++;
+        this.className = this.constructor.name;
     };
 
     getId() {

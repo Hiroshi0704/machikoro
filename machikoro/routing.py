@@ -1,5 +1,7 @@
-from channels.routing import route
+from django.urls import re_path
 
-channel_routing = [
-    route("http.request", "machikoro.consumers.http_consumer"),
+from . import consumers
+
+websocket_urlpatterns = [
+    re_path(r'ws/machikoro/(?P<room_name>\w+)/$', consumers.MachikoroConsumer.as_asgi()),
 ]

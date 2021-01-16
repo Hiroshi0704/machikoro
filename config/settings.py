@@ -125,12 +125,13 @@ os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 ASGI_APPLICATION = 'config.asgi.application'
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        'CONFIG': {
-            'hosts': [('127.0.0.1', 6379)],
-        }
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+#         "BACKEND": "channels.layers.InMemoryChannelLayer"
     },
 }
-
